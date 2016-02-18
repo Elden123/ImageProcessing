@@ -3,9 +3,9 @@ import cv2
 import random
 
 def main():
-    img = cv2.imread('/Users/Nolan/Documents/2016_MED.jpg')
+    img = cv2.imread('/Users/Nolan/Documents/2016.jpg')
     img2 = cv2.imread('/Users/Nolan/Documents/frcGOAL.jpg')
-
+    imgToMatch = cv2.imread('/Users/Nolan/Documents/frcGOAL.png')
 
     # define range of blue color in HSV
     lower_blue = np.array([240,240,240])
@@ -18,10 +18,19 @@ def main():
     res = cv2.bitwise_and(img,img, mask= mask)
 
     edges = cv2.Canny(res,50,150,apertureSize = 3)
+    edges1 = cv2.Canny(imgToMatch,50,150,apertureSize = 3)
 
     cv2.imwrite("/Users/Nolan/Documents/theEdges.png", edges)
+    cv2.imwrite("/Users/Nolan/Documents/theFrcEdges.png", edges1)
 
     contours, hierarchy = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_TC89_KCOS)
+    contours1, hierarchy1 = cv2.findContours(edges1, cv2.RETR_LIST, cv2.CHAIN_APPROX_TC89_KCOS)
+
+    goalNum = 0
+    
+    contour1 = contours1[1]
+
+    cv2.imwrite("/Users/Nolan/Documents/theFrcGoal.png", imgToMatch)
 
     for i in range(0, len(contours)):
         contour = contours[i]
@@ -36,43 +45,18 @@ def main():
         r = random.randint(128, 255)
         cv2.drawContours(img, contours, i, [b, g, r], 5)
         cv2.putText(img, area,(cx, cy), cv2.FONT_HERSHEY_SIMPLEX, .5,(r, g, b),2)
+        matching = cv2.matchShapes(contour1,contour,1,0.0)
+        print(matching, i)
+        if matching <= 8.0:
+            print("*************************GOAL*************************")
+            goalNum += 1
+
+    if goalNum >= 2:
+        print("Oops! ", goalNum, " goals were found")
 
     whitePixels = 0
-
     
     cv2.imwrite("/Users/Nolan/Documents/theContors.png", img)
-
-    #for h in range(0, 2987):
-     #   for w in range(0, 5311):
-      #      if not np.all([res[h, w], [0,0,0]]):
-        #        whitePixels += 1
-         #       print( whitePixels )
-          #      isGoal(h, w, res)  
-
-def isGoal(height, width, img):
-    white = []
-    whiteCount = 0
-    for w in range(width, width + 250):
-        if not np.all([img[height, w], [0,0,0]]):
-            white.append(1)
-        else:
-            white.append(0)
-    for l in white:
-        if white[l] == 1:
-            whiteCount = whiteCount + 1
-    if whiteCount >= 230:
-        white = []
-        for i in range(height, height + 100):
-            if not np.all([img[100, 100], [0,0,0]]):
-                white.append(1)
-            else:
-                white.append(0)
-        whiteCount = 0
-        for j in white:
-            if white[j] == 1:
-                whiteCount = whiteCount + 1
-        if whiteCount >= 50:
-            print("*************GOAL**************")
 
 if __name__ == '__main__':
     main()
