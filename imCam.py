@@ -3,39 +3,42 @@ import cv2
 import random
 
 def main():
-    img = cv2.imread('/Users/Nolan/Documents/2016.jpg')
-    img2 = cv2.imread('/Users/Nolan/Documents/frcGOAL.jpg')
+
+    img = cv2.imread('/Users/Nolan/Documents/theGreenGoal2.png')
+    img2 = cv2.imread('/Users/Nolan/Documents/theGreenGoal2.png')
     imgToMatch = cv2.imread('/Users/Nolan/Documents/frcGOAL.png')
+    
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    # define range of blue color in HSV
-    lower_blue = np.array([240,240,240])
-    upper_blue = np.array([255,255,255])
+    lower_green = np.array([50, 50, 120])
+    upper_green = np.array([70, 255, 255])
 
-    # Threshold the HSV image to get only blue colors
-    mask = cv2.inRange(img, lower_blue, upper_blue)
+    mask = cv2.inRange(hsv, lower_green, upper_green)
 
-    # Bitwise-AND mask and original image
+    cv2.imwrite("/Users/Nolan/Documents/theMask.png", mask)
+
     res = cv2.bitwise_and(img,img, mask= mask)
+
+    cv2.imwrite("/Users/Nolan/Documents/theRES.png", res)
 
     edges = cv2.Canny(res,50,150,apertureSize = 3)
     edges1 = cv2.Canny(imgToMatch,50,150,apertureSize = 3)
 
     cv2.imwrite("/Users/Nolan/Documents/theEdges.png", edges)
-    cv2.imwrite("/Users/Nolan/Documents/theFrcEdges.png", edges1)
 
     contours, hierarchy = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_TC89_KCOS)
     contours1, hierarchy1 = cv2.findContours(edges1, cv2.RETR_LIST, cv2.CHAIN_APPROX_TC89_KCOS)
 
     goalNum = 0
-    
     contour1 = contours1[1]
 
-    cv2.imwrite("/Users/Nolan/Documents/theFrcGoal.png", imgToMatch)
+    potGoalSpot = []
+    potGoalNum = []
 
     for i in range(0, len(contours)):
         contour = contours[i]
         M = cv2.moments(contour)
-        if M['m00'] <= 300:
+        if M['m00'] <= 50:
             continue
         cx = int(M['m10']/M['m00'])
         cy = int(M['m01']/M['m00'])
@@ -46,17 +49,19 @@ def main():
         cv2.drawContours(img, contours, i, [b, g, r], 5)
         cv2.putText(img, area,(cx, cy), cv2.FONT_HERSHEY_SIMPLEX, .5,(r, g, b),2)
         matching = cv2.matchShapes(contour1,contour,1,0.0)
+        potGoalSpot.append(i)
+        potGoalNum.append(matching)
         print(matching, i)
-        if matching <= 8.0:
-            print("*************************GOAL*************************")
-            goalNum += 1
-
-    if goalNum >= 2:
-        print("Oops! ", goalNum, " goals were found")
+        
+    print("************Potential goal at spot ", potGoalSpot[min(xrange(len(potGoalNum)),key=potGoalNum.__getitem__)], " and with number ", min(potGoalNum))
 
     whitePixels = 0
-    
+
+    contour = contours[potGoalSpot[min(xrange(len(potGoalNum)),key=potGoalNum.__getitem__)]]
+    cv2.drawContours(img2, contours, potGoalSpot[min(xrange(len(potGoalNum)),key=potGoalNum.__getitem__)], [0, 0, 255], 5)
+
     cv2.imwrite("/Users/Nolan/Documents/theContors.png", img)
+    cv2.imwrite("/Users/Nolan/Documents/theContorsWithOne.png", img2)
 
 if __name__ == '__main__':
     main()
