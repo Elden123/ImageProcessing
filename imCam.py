@@ -58,10 +58,54 @@ def main():
     whitePixels = 0
 
     contour = contours[potGoalSpot[min(xrange(len(potGoalNum)),key=potGoalNum.__getitem__)]]
-    cv2.drawContours(img2, contours, potGoalSpot[min(xrange(len(potGoalNum)),key=potGoalNum.__getitem__)], [0, 0, 255], 5)
+    cv2.drawContours(img2, contours, potGoalSpot[min(xrange(len(potGoalNum)),key=potGoalNum.__getitem__)], [0, 0, 255], 1)
+
+    img2[contour[0][0][1], contour[0][0][0]] = [255, 0, 0]
+
+    newHigh = 0
+    newHighSpot = 0
+    isHigh = False
+    for j in range(0, len(contour)):
+        newHigh = contour[j][0][0]
+        newHighSpot = j
+        for k in range(0, len(contour)):
+            if newHigh >= contour[k][0][0]:
+                isHigh = True
+            else:
+                isHigh = False
+                break
+        if isHigh == True:
+            break
+    if isHigh == True:
+        print(contour[newHighSpot][0][0])
+
+    newLow = 0
+    newLowSpot = 0
+    isLow = False
+    for l in range(0, len(contour)):
+        newLow = contour[l][0][0]
+        newLowSpot = l
+        for m in range(0, len(contour)):
+            if newLow <= contour[m][0][0]:
+                isLow = True
+            else:
+                isLow = False
+                break
+        if isLow == True:
+            break
+    if isLow == True:
+        print(contour[newLowSpot][0][0])  
+
+    pixelD = newHigh - newLow
+
+    print("* ", pixelD)  
 
     cv2.imwrite("/Users/Nolan/Documents/theContors.png", img)
     cv2.imwrite("/Users/Nolan/Documents/theContorsWithOne.png", img2)
+
+    #print(min(contour))
+
+
 
 if __name__ == '__main__':
     main()
