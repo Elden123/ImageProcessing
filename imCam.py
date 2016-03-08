@@ -103,9 +103,25 @@ def main():
     cv2.imwrite("/Users/Nolan/Documents/theContors.png", img)
     cv2.imwrite("/Users/Nolan/Documents/theContorsWithOne.png", img2)
 
-    #print(min(contour))
+    # Distance to an object, everythin in mm or pixels
+    focalLength = 1.0 # Will change for every camera, 1.0 is not correct, in mm
+    goalWidthReal = 457.2 # real width of goal in mm. 1.5 ft
+    imageWidth = 1000 # Will change for every camera, 1000 is not correct, in pixels
+    goalWidthPixels = pixelD # Determined above
+    sensorWidth = 1.0 # Will change for every camera, 1.0 is not correct, in mm
 
+    distanceToObject = (focalLength * goalWidthReal * imageWidth) / (goalWidthPixels * sensorWidth)
 
+    height, width, channels = img.shape
+
+    if ((contour[newHighSpot][0][1] + contour[newLowSpot][0][1]) / 2) < height / 2:
+        yFromCenter = (height / 2) - (height / 2 - ((contour[newHighSpot][0][1] + contour[newLowSpot][0][1]) / 2)
+    elif ((contour[newHighSpot][0][1] + contour[newLowSpot][0][1]) / 2) > height / 2:
+        yFromCenter = (height / 2) - (height / 2 - ((contour[newHighSpot][0][1] + contour[newLowSpot][0][1]) / 2)
+    else:
+        yFromCenter = 0 
+
+    height, width, channels = img.shape
 
 if __name__ == '__main__':
     main()
