@@ -13,11 +13,17 @@ def serialStuff():
     port.open()
     port.flushInput()
     port.flushOutput()
-    port.write('hi'.encode('utf-8'))
-    port.flush()
-    mrmaas = port.inWaiting()
-    print(mrmaas)
-    print(port.read(mrmaas))
+    while True:
+        command = port.inWaiting()
+        if command == "TopKek":
+            port.write('toplel'.encode('utf-8'))
+        elif command == "fire":
+            angle, distance, angle2 = imageShoot()
+            port.write(str(angle).encode('utf-8'))
+            port.write(str(distance).encode('utf-8'))
+            port.write(str(angle2).encode('utf-8'))
+        port.flush()
+
 
 
 
@@ -115,8 +121,8 @@ def imageShoot():
 
     pixelD = newHigh - newLow
 
-    cv2.imwrite("/Users/Nolan/Documents/theContors.png", img)
-    cv2.imwrite("/Users/Nolan/Documents/theContorsWithOne.png", img2)
+    #cv2.imwrite("/Users/Nolan/Documents/theContors.png", img)
+    #cv2.imwrite("/Users/Nolan/Documents/theContorsWithOne.png", img2)
 
 
 
@@ -124,11 +130,11 @@ def imageShoot():
 
 
     # Distance to an object, everythin in mm or pixels
-    focalLength = 3.6 # Will change for every camera, 1.0 is not correct, in mm
+    focalLength = 1.0 # Will change for every camera, 1.0 is not correct, in mm
     goalWidthReal = 457.2 # real width of goal in mm. 1.5 ft
     imageWidth = 1000 # Will change for every camera, 1000 is not correct, in pixels
     goalWidthPixels = pixelD # Determined above
-    sensorWidth = 3.76 # Will change for every camera, 1.0 is not correct, in mm
+    sensorWidth = 1.0 # Will change for every camera, 1.0 is not correct, in mm
 
     distanceToObject = (focalLength * goalWidthReal * imageWidth) / (goalWidthPixels * sensorWidth)
 
@@ -199,5 +205,4 @@ def imageShoot():
     return groundDistance, xToCorrectAngle, yToCorrectAngle
 
 
-if __name__ == '__main__':
-    imageShoot()
+serialStuff()
