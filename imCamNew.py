@@ -2,11 +2,37 @@ import numpy as np
 import cv2
 import random
 import math
+import serial
+import picamera
+import picamera.array
 
-def main():
 
-    img = cv2.imread('/Users/Nolan/Documents/theGreenGoal.png')
-    img2 = cv2.imread('/Users/Nolan/Documents/theGreenGoal.png')
+def serialStuff():
+    
+    port = serial.Serial('/dev/ttyAMA0')
+    port.open()
+    port.flushInput()
+    port.flushOutput()
+    port.write('hi'.encode('utf-8'))
+    port.flush()
+    mrmaas = port.inWaiting()
+    print(mrmaas)
+    print(port.read(mrmaas))
+
+
+
+
+def imageShoot():
+
+    #img = cv2.imread('/Users/Nolan/Documents/theGreenGoal.png')
+    #img2 = cv2.imread('/Users/Nolan/Documents/theGreenGoal.png')
+    with picamera.PiCamera() as camera:
+        camera.start_preview()
+        time.sleep(2)
+    with picamera.array.PiRGBArray(camera) as stream:
+        camera.capture(stream, format='bgr')
+        # At this point the image is available as stream.array
+        img = stream.array
     imgToMatch = cv2.imread('/Users/Nolan/Documents/frcGOAL.png')
 
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -51,9 +77,9 @@ def main():
     whitePixels = 0
 
     contour = contours[potGoalSpot[min(xrange(len(potGoalNum)),key=potGoalNum.__getitem__)]]
-    cv2.drawContours(img2, contours, potGoalSpot[min(xrange(len(potGoalNum)),key=potGoalNum.__getitem__)], [0, 0, 255], 1)
+    #cv2.drawContours(img2, contours, potGoalSpot[min(xrange(len(potGoalNum)),key=potGoalNum.__getitem__)], [0, 0, 255], 1)
 
-    img2[contour[0][0][1], contour[0][0][0]] = [255, 0, 0]
+    #img2[contour[0][0][1], contour[0][0][0]] = [255, 0, 0]
 
     # Finds the highest x value in the contour array
     newHigh = 0
@@ -169,7 +195,8 @@ def main():
     # groundDistance line 167
     # xToCorrectAngle line 165
     # yToCorrectAngle line 145
+    return groundDistance, xToCorrectAngle, yToCorrectAngle
 
 
 if __name__ == '__main__':
-    main()
+    imageShoot()
