@@ -173,6 +173,7 @@ def imageShoot():
 
 
 
+
     # Finds the distance in pixels between the center of the screen and newHighSpot... found in the first set of for loops
     toWidth = ((contour[newHighSpot][0][0] + contour[newLowSpot][0][0]) / 2)
 
