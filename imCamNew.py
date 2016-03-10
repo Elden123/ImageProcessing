@@ -13,11 +13,17 @@ def serialStuff():
     port.open()
     port.flushInput()
     port.flushOutput()
-    port.write('hi'.encode('utf-8'))
-    port.flush()
-    mrmaas = port.inWaiting()
-    print(mrmaas)
-    print(port.read(mrmaas))
+    while True:
+        command = port.inWaiting()
+        if command == "TopKek":
+            port.write('toplel'.encode('utf-8'))
+        elif command == "fire":
+            angle, distance, angle2 = imageShoot()
+            port.write(str(angle).encode('utf-8'))
+            port.write(str(distance).encode('utf-8'))
+            port.write(str(angle2).encode('utf-8'))
+        port.flush()
+
 
 
 
@@ -115,8 +121,8 @@ def imageShoot():
 
     pixelD = newHigh - newLow
 
-    cv2.imwrite("/Users/Nolan/Documents/theContors.png", img)
-    cv2.imwrite("/Users/Nolan/Documents/theContorsWithOne.png", img2)
+    #cv2.imwrite("/Users/Nolan/Documents/theContors.png", img)
+    #cv2.imwrite("/Users/Nolan/Documents/theContorsWithOne.png", img2)
 
 
 
@@ -199,5 +205,4 @@ def imageShoot():
     return groundDistance, xToCorrectAngle, yToCorrectAngle
 
 
-if __name__ == '__main__':
-    imageShoot()
+serialStuff()
